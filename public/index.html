@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Facebook Share API - Test Interface</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+        }
+
+        @media (max-width: 768px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        }
+
+        .card h2 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 500;
+        }
+
+        input, textarea, select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.3s;
+            font-family: monospace;
+        }
+
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102,126,234,0.1);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        button {
+            flex: 1;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102,126,234,0.4);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c82333;
+        }
+
+        .response-area {
+            background: #1e1e1e;
+            border-radius: 8px;
+            padding: 20px;
+            overflow-x: auto;
+        }
+
+        .response-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #333;
+        }
+
+        .response-header h3 {
+            color: #fff;
+            font-size: 1.1em;
+        }
+
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .status-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .status-error {
+            background: #dc3545;
+            color: white;
+        }
+
+        .status-pending {
+            background: #ffc107;
+            color: #333;
+        }
+
+        pre {
+            margin: 0;
+            color: #d4d4d4;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 13px;
+            line-height: 1.5;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .json-key {
+            color: #9cdcfe;
+        }
+
+        .json-string {
+            color: #ce9178;
+        }
+
+        .json-number {
+            color: #b5cea8;
+        }
+
+        .json-boolean {
+            color: #569cd6;
+        }
+
+        .json-null {
+            color: #569cd6;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .info-box {
+            background: #f8f9fa;
+            border-left: 4px solid #667eea;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+        }
+
+        .info-box h4 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .info-box code {
+            background: #e9ecef;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: monospace;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .stat-card .number {
+            font-size: 2em;
+            font-weight: bold;
+        }
+
+        .stat-card .label {
+            font-size: 0.85em;
+            opacity: 0.9;
+            margin-top: 5px;
+        }
+
+        .quick-test {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        .quick-test button {
+            margin: 5px;
+            padding: 8px 16px;
+            font-size: 12px;
+        }
+
+        .history-item {
+            background: #f8f9fa;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .history-item:hover {
+            background: #e9ecef;
+            transform: translateX(5px);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 Facebook Share API Tester</h1>
+            <p>Test your Facebook sharing automation with real-time JSON response highlighting</p>
+        </div>
+
+        <div class="main-grid">
+            <!-- Left Panel - Input Form -->
+            <div class="card">
+                <h2>📝 API Request Parameters</h2>
+                
+                <div class="info-box">
+                    <h4>📌 API Endpoint</h4>
+                    <code>GET http://localhost:5000/api/shirr</code>
+                </div>
+
+                <form id="shareForm">
+                    <div class="form-group">
+                        <label>🍪 Facebook Cookie *</label>
+                        <textarea id="cookie" placeholder="c_user=123456789; xs=1234567890; fr=abc123xyz..." required></textarea>
+                        <small style="color: #666; display: block; margin-top: 5px;">
+                            Get cookie from browser: F12 → Console → document.cookie
+                        </small>
+                    </div>
+
+                    <div class="form-group">
+                        <label>🔗 Facebook Post Link *</label>
+                        <input type="url" id="link" placeholder="https://www.facebook.com/username/posts/123456789" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>🔢 Share Limit * (Max: 50)</label>
+                        <input type="number" id="limit" min="1" max="50" value="5" required>
+                    </div>
+
+                    <div class="button-group">
+                        <button type="submit" class="btn-primary">🚀 Send Request</button>
+                        <button type="button" class="btn-secondary" onclick="clearForm()">🗑️ Clear</button>
+                    </div>
+                </form>
+
+                <div class="quick-test">
+                    <h4>⚡ Quick Test Examples</h4>
+                    <button onclick="setExample('basic')" class="btn-secondary">Basic Example</button>
+                    <button onclick="setExample('group')" class="btn-secondary">Group Post</button>
+                    <button onclick="setExample('page')" class="btn-secondary">Page Post</button>
+                </div>
+            </div>
+
+            <!-- Right Panel - Response -->
+            <div class="card">
+                <h2>📊 API Response</h2>
+                
+                <div class="stats" id="stats" style="display: none;">
+                    <div class="stat-card">
+                        <div class="number" id="successCount">0</div>
+                        <div class="label">Successful</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="number" id="failedCount">0</div>
+                        <div class="label">Failed</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="number" id="successRate">0%</div>
+                        <div class="label">Success Rate</div>
+                    </div>
+                </div>
+
+                <div class="response-area">
+                    <div class="response-header">
+                        <h3>📋 Response JSON</h3>
+                        <div>
+                            <span id="statusBadge" class="status-badge"></span>
+                            <button onclick="copyResponse()" style="margin-left: 10px; padding: 4px 12px; font-size: 12px;">📋 Copy</button>
+                            <button onclick="downloadResponse()" style="margin-left: 5px; padding: 4px 12px; font-size: 12px;">💾 Download</button>
+                        </div>
+                    </div>
+                    <pre id="response"><span style="color: #6c757d;">// Click "Send Request" to test the API</span></pre>
+                </div>
+
+                <div id="requestInfo" style="margin-top: 15px; font-size: 12px; color: #666;">
+                    <span id="requestTime"></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- History Panel -->
+        <div class="card" style="margin-top: 25px;">
+            <h2>📜 Request History</h2>
+            <div id="historyList" style="max-height: 200px; overflow-y: auto;">
+                <p style="color: #999; text-align: center;">No requests yet. Send a request to see history.</p>
+            </div>
+            <button onclick="clearHistory()" class="btn-danger" style="margin-top: 15px; width: auto; padding: 8px 20px;">🗑️ Clear History</button>
+        </div>
+    </div>
+
+    <script>
+        let requestHistory = [];
+
+        // Syntax highlighting for JSON
+        function syntaxHighlight(json) {
+            if (typeof json != 'string') {
+                json = JSON.stringify(json, null, 2);
+            }
+            json = json.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+            return json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, function (match) {
+                let cls = 'json-number';
+                if (/^"/.test(match)) {
+                    if (/:$/.test(match)) {
+                        cls = 'json-key';
+                    } else {
+                        cls = 'json-string';
+                    }
+                } else if (/true|false/.test(match)) {
+                    cls = 'json-boolean';
+                } else if (/null/.test(match)) {
+                    cls = 'json-null';
+                }
+                return '<span class="' + cls + '">' + match + '</span>';
+            });
+        }
+
+        // Display response with highlighting
+        function displayResponse(data, status) {
+            const responsePre = document.getElementById('response');
+            const statusBadge = document.getElementById('statusBadge');
+            const statsDiv = document.getElementById('stats');
+            
+            if (status === 'success') {
+                statusBadge.className = 'status-badge status-success';
+                statusBadge.textContent = '✓ Success';
+                responsePre.innerHTML = syntaxHighlight(data);
+                
+                // Show stats if available
+                if (data.summary) {
+                    statsDiv.style.display = 'grid';
+                    document.getElementById('successCount').textContent = data.summary.successful || 0;
+                    document.getElementById('failedCount').textContent = data.summary.failed || 0;
+                    document.getElementById('successRate').textContent = data.summary.success_rate || '0%';
+                } else {
+                    statsDiv.style.display = 'none';
+                }
+            } else {
+                statusBadge.className = 'status-badge status-error';
+                statusBadge.textContent = '✗ Error';
+                responsePre.innerHTML = syntaxHighlight(data);
+                statsDiv.style.display = 'none';
+            }
+        }
+
+        // Display loading state
+        function setLoading(isLoading) {
+            const submitBtn = document.querySelector('button[type="submit"]');
+            if (isLoading) {
+                submitBtn.innerHTML = '<span class="loading"></span> Processing...';
+                submitBtn.disabled = true;
+                document.getElementById('response').innerHTML = '<span style="color: #ffc107;">⏳ Sending request to API...</span>';
+            } else {
+                submitBtn.innerHTML = '🚀 Send Request';
+                submitBtn.disabled = false;
+            }
+        }
+
+        // Save to history
+        function saveToHistory(request, response, success) {
+            const historyItem = {
+                id: Date.now(),
+                timestamp: new Date().toISOString(),
+                request: { ...request, cookie: request.cookie.substring(0, 50) + '...' },
+                response: response,
+                success: success
+            };
+            requestHistory.unshift(historyItem);
+            if (requestHistory.length > 10) requestHistory.pop();
+            localStorage.setItem('apiHistory', JSON.stringify(requestHistory));
+            displayHistory();
+        }
+
+        // Display history
+        function displayHistory() {
+            const historyDiv = document.getElementById('historyList');
+            if (requestHistory.length === 0) {
+                historyDiv.innerHTML = '<p style="color: #999; text-align: center;">No requests yet. Send a request to see history.</p>';
+                return;
+            }
+            
+            historyDiv.innerHTML = requestHistory.map(item => `
+                <div class="history-item" onclick="loadHistoryItem(${item.id})">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <strong>${new Date(item.timestamp).toLocaleTimeString()}</strong>
+                            <span style="color: ${item.success ? '#28a745' : '#dc3545'}; margin-left: 10px;">
+                                ${item.success ? '✓ Success' : '✗ Failed'}
+                            </span>
+                        </div>
+                        <div style="font-size: 11px; color: #666;">
+                            Limit: ${item.request.limit}
+                        </div>
+                    </div>
+                    <div style="font-size: 12px; margin-top: 5px; color: #666; overflow: hidden; text-overflow: ellipsis;">
+                        ${item.request.link}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Load history item
+        window.loadHistoryItem = function(id) {
+            const item = requestHistory.find(h => h.id === id);
+            if (item) {
+                document.getElementById('cookie').value = item.request.cookie;
+                document.getElementById('link').value = item.request.link;
+                document.getElementById('limit').value = item.request.limit;
+                displayResponse(item.response, item.success ? 'success' : 'error');
+                document.getElementById('requestTime').innerHTML = `📅 Request from: ${new Date(item.timestamp).toLocaleString()}`;
+            }
+        }
+
+        // Clear history
+        function clearHistory() {
+            requestHistory = [];
+            localStorage.removeItem('apiHistory');
+            displayHistory();
+        }
+
+        // Copy response
+        function copyResponse() {
+            const responseText = document.getElementById('response').innerText;
+            navigator.clipboard.writeText(responseText);
+            alert('Response copied to clipboard!');
+        }
+
+        // Download response
+        function downloadResponse() {
+            const responseText = document.getElementById('response').innerText;
+            const blob = new Blob([responseText], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `api_response_${Date.now()}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        // Clear form
+        function clearForm() {
+            document.getElementById('cookie').value = '';
+            document.getElementById('link').value = '';
+            document.getElementById('limit').value = '5';
+            document.getElementById('response').innerHTML = '<span style="color: #6c757d;">// Form cleared. Enter new values and send request.</span>';
+            document.getElementById('stats').style.display = 'none';
+            document.getElementById('statusBadge').className = 'status-badge';
+            document.getElementById('statusBadge').textContent = '';
+        }
+
+        // Set example
+        function setExample(type) {
+            if (type === 'basic') {
+                document.getElementById('cookie').value = 'c_user=YOUR_C_USER_ID; xs=YOUR_XS_TOKEN; fr=YOUR_FR_TOKEN';
+                document.getElementById('link').value = 'https://www.facebook.com/username/posts/123456789';
+                document.getElementById('limit').value = '5';
+            } else if (type === 'group') {
+                document.getElementById('cookie').value = 'c_user=YOUR_C_USER_ID; xs=YOUR_XS_TOKEN; fr=YOUR_FR_TOKEN';
+                document.getElementById('link').value = 'https://www.facebook.com/groups/groupid/posts/postid';
+                document.getElementById('limit').value = '3';
+            } else if (type === 'page') {
+                document.getElementById('cookie').value = 'c_user=YOUR_C_USER_ID; xs=YOUR_XS_TOKEN; fr=YOUR_FR_TOKEN';
+                document.getElementById('link').value = 'https://www.facebook.com/pagename/posts/123456789';
+                document.getElementById('limit').value = '10';
+            }
+        }
+
+        // Handle form submission
+        document.getElementById('shareForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const cookie = document.getElementById('cookie').value;
+            const link = document.getElementById('link').value;
+            const limit = document.getElementById('limit').value;
+            
+            if (!cookie || !link || !limit) {
+                alert('Please fill in all fields');
+                return;
+            }
+            
+            setLoading(true);
+            const startTime = new Date();
+            
+            try {
+                const response = await fetch(`/api/shirr?cookie=${encodeURIComponent(cookie)}&link=${encodeURIComponent(link)}&limit=${limit}`);
+                const data = await response.json();
+                const endTime = new Date();
+                const duration = (endTime - startTime) / 1000;
+                
+                const success = response.ok && data.status === true;
+                displayResponse(data, success ? 'success' : 'error');
+                
+                document.getElementById('requestTime').innerHTML = `⏱️ Response time: ${duration.toFixed(2)}s | 📅 ${new Date().toLocaleString()}`;
+                
+                // Save to history
+                saveToHistory({ cookie, link, limit }, data, success);
+                
+            } catch (error) {
+                const errorResponse = {
+                    status: false,
+                    error: 'NETWORK_ERROR',
+                    message: error.message,
+                    timestamp: new Date().toISOString()
+                };
+                displayResponse(errorResponse, 'error');
+                document.getElementById('requestTime').innerHTML = `❌ Error: ${error.message}`;
+                saveToHistory({ cookie, link, limit }, errorResponse, false);
+            } finally {
+                setLoading(false);
+            }
+        });
+
+        // Load history from localStorage
+        const savedHistory = localStorage.getItem('apiHistory');
+        if (savedHistory) {
+            requestHistory = JSON.parse(savedHistory);
+            displayHistory();
+        }
+
+        // Health check on load
+        async function checkHealth() {
+            try {
+                const response = await fetch('/api/health');
+                const data = await response.json();
+                console.log('API Health:', data);
+            } catch (error) {
+                console.warn('API not reachable. Make sure server is running on port 5000');
+            }
+        }
+        checkHealth();
+    </script>
+</body>
+</html>
